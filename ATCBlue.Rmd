@@ -1,0 +1,119 @@
+---
+title: "ATC Blue E-Padlock Swapout Project"
+author: "ATC"
+date: "20/07/2020 to 21/07/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r LoadLibraries, echo=FALSE, message=FALSE, warning=FALSE}
+## Import Libraries
+library(leaflet) ## Creating leaftlet map
+library(xlsx) ## For reading excel file
+library(dplyr) ## For data manipulation
+```
+
+
+# Cluster 1 and 2
+   
+
+```{r Iengineering, echo=FALSE, message=FALSE, warning=FALSE, fig.align="center", cache=TRUE}
+## Read the data
+## Read the site data
+sitedata <- read.xlsx("Padlock Swap Locations.xlsx", sheetName = "Site Padlock Migration Audit")
+
+## Read the original all site database
+database <- read.xlsx("New Site Allocation.xlsx", sheetName = "Sheet1")
+
+## Clean the data
+
+##Remove all columns having NAs completely
+sitedata <- sitedata[, !apply(sitedata, 2, function(x) all(is.na(x)))]
+
+## Remove all rows having NAs completely
+sitedata <- sitedata[!apply(sitedata, 1, function(x) all(is.na(x))),]
+
+## Select the rows for the Latitudes, Longitudes and Region
+siteLocations <- sitedata[,c("Site.Name", "X.ATC.Site.ID", 
+                             "latitude", "longitude", "Cluster", "Responsible")]
+
+## Select the sites in ready clusters
+siteLocations <- siteLocations[siteLocations$Cluster %in% c(1,2), ]
+
+## Merge the data selected data with site database to get accurate locations
+siteLocationsClean <- merge(siteLocations, database, by.x = "X.ATC.Site.ID", by.y = "New.ID")
+
+## Remove missing values data
+#siteLocations <- na.omit(siteLocations)
+# Check if all missing values are removed
+#table(is.na(siteLocations))
+# Check the structure of the data frame
+#str(siteLocations)
+# Change Name variable from Factor to character type
+siteLocationsClean$Site.Name <- as.character(siteLocationsClean$Site.Name)
+siteLocationsClean$Regional.Supervisor <- as.factor(siteLocationsClean$Regional.Supervisor)
+siteLocationsClean$Cluster <- as.factor(siteLocationsClean$Cluster)
+## Remove wrong value of Mutara_House
+#siteLocations <- siteLocations[!(siteLocations$ATC.Site.Name == c("Mutara_House")),]
+```
+
+```{r graphs, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
+# Setting your own colors manually:
+pal <- colorFactor(
+  palette = c('blue', 'red'),#, 'green', "yellow", "orange", "black", "purple", "pink", "brown", "grey"),
+  domain = siteLocationsClean$Regional.Supervisor
+)
+
+#pal <- colorFactor(
+#  palette = 'Dark2',
+#  domain = siteLocations$Allocation)
+
+## Plot the map
+## Plot map according to the regions of the sites
+leaflet(siteLocationsClean) %>% addTiles() %>% addMarkers(group = siteLocationsClean$Regional.Supervisor, lat = siteLocationsClean$Latitude, lng = siteLocationsClean$Longitude, popup = paste("SiteName:" = siteLocationsClean$Site.Name, "</br>",
+                                                                                                                              "SiteID:" = siteLocationsClean$X.ATC.Site.ID  ), clusterOptions = markerClusterOptions())
+
+```
+
+
+
+```{r CircularPins, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
+#leaflet(siteLocations) %>% addTiles() %>% addMarkers(lat = siteLocations$Latitude, lng = siteLocations$Longitude) %>% addPopups(siteLocations$Site.name,siteLocations$Site.ID, options = popupOptions(closeButton = FALSE))
+leaflet(siteLocationsClean) %>%
+  addTiles() %>%
+  addCircles(lat = siteLocationsClean$Latitude, lng = siteLocationsClean$Longitude, weight = 1, 
+              popup = paste("SiteName:" = siteLocationsClean$Site.name, "</br>",                                                      "SiteID:" = siteLocationsClean$Site.ID  ), 
+             color = ~pal(Responsible), radius = 20000) #%>% addPopups(siteLocations$Site.name,siteLocations$Site.ID, options = popupOptions(closeButton = FALSE))
+```
+
+
+```{r testing, fig.width=12, fig.height=8, echo=FALSE, message=FALSE, warning=FALSE}
+# fig.width=12, fig.height=8
+pal <- colorFactor(
+  palette = c('magenta','skyblue', 'blue','yellow','green', 'dark green', 'red'),#, 'green', "yellow", "orange", "black", "purple", "pink", "brown", "grey"),
+  domain = siteLocationsClean$Responsible
+)
+
+## Remove unnecessary info to allow functions to guess latitudes and longitudes
+siteLocationsClean <- siteLocationsClean[, c(1, 2, 5, 6, 10, 11, 12, 13, 17)]
+
+## Plot on the map
+leaflet() %>%
+# Basic markers
+addTiles(group = "basic") %>%
+addMarkers(data = siteLocationsClean, group = "basic", popup = paste("SiteName:" = siteLocationsClean$Site.Name, "</br>",                                                                                        "SiteID:" = siteLocationsClean$X.ATC.Site.ID,
+                        "</br>",                                                                                        "Supervisor:" = siteLocationsClean$Responsible  
+                      
+                                                                )) %>%
+# When zoomed in, we'll show circles at the base of each marker whose
+# radius and color reflect the magnitude
+addProviderTiles(providers$Stamen.TonerLite, group = "detail") %>%
+addCircleMarkers(data = siteLocationsClean, group = "detail", fillOpacity = 0.5,
+radius = 25, color = ~pal(Responsible), stroke = FALSE) %>%
+# Set the detail group to only appear when zoomed in
+groupOptions("detail", zoomLevels = 7:18)
+```
