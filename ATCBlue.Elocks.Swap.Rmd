@@ -21,7 +21,7 @@ library(dplyr) ## For data manipulation
 # Cluster 1 and 2
    
 
-```{r Iengineering, echo=FALSE, message=FALSE, warning=FALSE, fig.align="center", cache=TRUE}
+```{r Iengineering, echo=FALSE, message=FALSE, warning=FALSE, fig.align="center"}
 ## Read the data
 ## Read the site data
 sitedata <- read.xlsx("Padlock Swap Locations.xlsx", sheetName = "Site Padlock Migration Audit")
