@@ -42,7 +42,7 @@ siteLocations <- sitedata[,c("Site.Name", "X.ATC.Site.ID",
                              "latitude", "longitude", "Cluster", "Responsible")]
 
 ## Select the sites in ready clusters
-siteLocations <- siteLocations[siteLocations$Cluster %in% c(1,2), ]
+siteLocations <- siteLocations[siteLocations$Cluster %in% c(3,4, 5, 6, 8, 9, 10, 12, 13, 14), ]
 
 ## Merge the data selected data with site database to get accurate locations
 siteLocationsClean <- merge(siteLocations, database, by.x = "X.ATC.Site.ID", by.y = "New.ID")
