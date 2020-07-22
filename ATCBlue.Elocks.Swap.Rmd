@@ -94,7 +94,8 @@ leaflet(siteLocationsClean) %>%
 ```{r testing, fig.width=12, fig.height=8, echo=FALSE, message=FALSE, warning=FALSE}
 # fig.width=12, fig.height=8
 pal <- colorFactor(
-  palette = c('magenta','skyblue', 'blue','yellow','green', 'dark green', 'red'),#, 'green', "yellow", "orange", "black", "purple", "pink", "brown", "grey"),
+  palette = c('magenta','skyblue', 'grey','yellow','green', 'dark green', 'red'),#, 'green', "yellow", "orange", "black", "purple", "pink", "brown", "grey"),
+  ## blue changed to grey
   domain = siteLocationsClean$Responsible
 )
 
