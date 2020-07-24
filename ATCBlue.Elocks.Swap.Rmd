@@ -39,10 +39,13 @@ sitedata <- sitedata[!apply(sitedata, 1, function(x) all(is.na(x))),]
 
 ## Select the rows for the Latitudes, Longitudes and Region
 siteLocations <- sitedata[,c("Site.Name", "X.ATC.Site.ID", 
-                             "latitude", "longitude", "Cluster", "Responsible")]
+                             "latitude", "longitude", "Cluster", "Responsible", "DeploymentDay")]
+
+##Select the sites for the day
+siteLocations <- siteLocations[siteLocations$DeploymentDay %in% c("Yes"),]
 
 ## Select the sites in ready clusters
-siteLocations <- siteLocations[siteLocations$Cluster %in% c(3,4, 5, 6, 8, 9, 10, 12, 13, 14), ]
+siteLocations <- siteLocations[siteLocations$Cluster %in% c(1, 2, 3,4, 5, 6,7, 8, 9, 10,11, 12, 13, 14), ]
 
 ## Merge the data selected data with site database to get accurate locations
 siteLocationsClean <- merge(siteLocations, database, by.x = "X.ATC.Site.ID", by.y = "New.ID")
@@ -57,6 +60,7 @@ siteLocationsClean <- merge(siteLocations, database, by.x = "X.ATC.Site.ID", by.
 siteLocationsClean$Site.Name <- as.character(siteLocationsClean$Site.Name)
 siteLocationsClean$Regional.Supervisor <- as.factor(siteLocationsClean$Regional.Supervisor)
 siteLocationsClean$Cluster <- as.factor(siteLocationsClean$Cluster)
+
 ## Remove wrong value of Mutara_House
 #siteLocations <- siteLocations[!(siteLocations$ATC.Site.Name == c("Mutara_House")),]
 ```
@@ -100,7 +104,7 @@ pal <- colorFactor(
 )
 
 ## Remove unnecessary info to allow functions to guess latitudes and longitudes
-siteLocationsClean <- siteLocationsClean[, c(1, 2, 5, 6, 10, 11, 12, 13, 17)]
+siteLocationsClean <- siteLocationsClean[, c(1, 2, 5, 6, 11, 12, 13, 14, 18)]
 
 ## Plot on the map
 leaflet() %>%
