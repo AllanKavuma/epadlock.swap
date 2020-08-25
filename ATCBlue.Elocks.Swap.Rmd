@@ -1,7 +1,7 @@
 ---
 title: "ATC Blue E-Padlock Swapout Project"
 author: "ATC"
-date: "30/07/2020"
+date: "25/08/2020"
 output: html_document
 ---
 
@@ -116,7 +116,7 @@ addMarkers(data = siteLocationsClean, group = "basic", popup = paste("SiteName:"
                                                                 )) %>%
 # When zoomed in, we'll show circles at the base of each marker whose
 # radius and color reflect the magnitude
-addProviderTiles(providers$Stamen.TonerLite, group = "detail") %>%
+#addProviderTiles(providers$Stamen.TonerLite, group = "detail") %>% #removed to include physical features
 addCircleMarkers(data = siteLocationsClean, group = "detail", fillOpacity = 0.5,
 radius = 25, color = ~pal(Responsible), stroke = FALSE) %>%
 # Set the detail group to only appear when zoomed in
