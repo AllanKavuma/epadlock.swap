@@ -45,7 +45,7 @@ siteLocations <- sitedata[,c("Site.Name", "X.ATC.Site.ID",
 siteLocations <- siteLocations[siteLocations$DeploymentDay %in% c("Yes"),]
 
 ## Select the sites in ready clusters
-siteLocations <- siteLocations[siteLocations$Cluster %in% c(1, 2, 3,4, 5, 6,7, 8, 9, 10,11, 12, 13, 14), ]
+siteLocations <- siteLocations[siteLocations$Cluster %in% 1:100, ]
 
 ## Merge the data selected data with site database to get accurate locations
 siteLocationsClean <- merge(siteLocations, database, by.x = "X.ATC.Site.ID", by.y = "New.ID")
