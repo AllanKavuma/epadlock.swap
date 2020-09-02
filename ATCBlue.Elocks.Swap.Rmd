@@ -122,3 +122,58 @@ radius = 25, color = ~pal(Responsible), stroke = FALSE) %>%
 # Set the detail group to only appear when zoomed in
 groupOptions("detail", zoomLevels = 7:18)
 ```
+
+# Pending Programming
+
+```{r Pending, fig.width=10, fig.height=7, echo=FALSE, message=FALSE, warning=FALSE}
+## Select the rows for the Latitudes, Longitudes and Region
+siteLocations2 <- sitedata[,c("Site.Name", "X.ATC.Site.ID", 
+                             "latitude", "longitude", "Cluster", "Responsible", "DeploymentDay")]
+
+##Select the sites for the day
+siteLocationsPending <- siteLocations2[siteLocations2$DeploymentDay %in% c("No"),]
+
+## Select the sites in ready clusters
+siteLocationsPending <- siteLocationsPending[siteLocationsPending$Cluster %in% 1:100, ]
+
+## Merge the data selected data with site database to get accurate locations
+siteLocationsCleanPending <- merge(siteLocationsPending, database, by.x = "X.ATC.Site.ID", by.y = "New.ID")
+
+## Remove missing values data
+#siteLocations <- na.omit(siteLocations)
+# Check if all missing values are removed
+#table(is.na(siteLocations))
+# Check the structure of the data frame
+#str(siteLocations)
+# Change Name variable from Factor to character type
+siteLocationsCleanPending$Site.Name <- as.character(siteLocationsCleanPending$Site.Name)
+siteLocationsCleanPending$Regional.Supervisor <- as.factor(siteLocationsCleanPending$Regional.Supervisor)
+siteLocationsCleanPending$Cluster <- as.factor(siteLocationsCleanPending$Cluster)
+
+
+# fig.width=12, fig.height=8
+pal <- colorFactor(
+  palette = c('magenta','skyblue', 'yellow','grey','green', 'dark green', 'red', "blue"),#, 'green', "yellow", "orange", "black", "purple", "pink", "brown", "grey"),
+  ## blue changed to grey
+  domain = siteLocationsCleanPending$Responsible
+)
+
+## Remove unnecessary info to allow functions to guess latitudes and longitudes
+siteLocationsCleanPending <- siteLocationsCleanPending[, c(1, 2, 5, 6, 11, 12, 13, 14, 18)]
+
+## Plot on the map
+leaflet() %>%
+# Basic markers
+addTiles(group = "basic") %>%
+addMarkers(data = siteLocationsCleanPending, group = "basic", popup = paste("SiteName:" = siteLocationsCleanPending$Site.Name, "</br>",                                                                                        "SiteID:" = siteLocationsCleanPending$X.ATC.Site.ID,
+                        "</br>",                                                                                        "Supervisor:" = siteLocationsCleanPending$Responsible  
+                      
+                                                                )) %>%
+# When zoomed in, we'll show circles at the base of each marker whose
+# radius and color reflect the magnitude
+#addProviderTiles(providers$Stamen.TonerLite, group = "detail") %>% #removed to include physical features
+addCircleMarkers(data = siteLocationsCleanPending, group = "detail", fillOpacity = 0.5,
+radius = 25, color = ~pal(Responsible), stroke = FALSE) %>%
+# Set the detail group to only appear when zoomed in
+groupOptions("detail", zoomLevels = 7:18)
+```
